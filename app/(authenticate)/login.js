@@ -1,14 +1,23 @@
+import React, { useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
+  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
-import React from "react";
+import { Fontisto } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const router = useRouter();
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -32,9 +41,120 @@ const login = () => {
             Log in to your Account
           </Text>
         </View>
-        <View>
-          <View></View>
+        <View style={{ marginTop: 70 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 5,
+              backgroundColor: "#E0E0E0",
+              paddingVertical: 5,
+              borderRadius: 5,
+              marginTop: 30,
+            }}
+          >
+            <Fontisto
+              style={{ marginLeft: 8, marginRight: 6 }}
+              name="email"
+              size={24}
+              color="gray"
+            />
+            <TextInput
+              style={{
+                color: "gray",
+                marginVertical: 10,
+                width: 300,
+                fontSize: email ? 18 : 18,
+              }}
+              placeholder="Enter your Email"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
+          </View>
         </View>
+        <View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 5,
+              backgroundColor: "#E0E0E0",
+              paddingVertical: 5,
+              borderRadius: 5,
+              marginTop: 30,
+            }}
+          >
+            <Entypo
+              style={{ marginLeft: 8, marginRight: 6 }}
+              name="lock"
+              size={24}
+              color="gray"
+            />
+            <TextInput
+              style={{
+                color: "gray",
+                marginVertical: 10,
+                width: 300,
+                fontSize: password ? 18 : 18,
+              }}
+              placeholder="Enter your Password"
+              secureTextEntry
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+            />
+          </View>
+        </View>
+        <View
+          style={{
+            marginTop: 12,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text>Keep me logged in</Text>
+          <Text style={{ color: "#007fff", fontWeight: "500" }}>
+            Forgot Password
+          </Text>
+        </View>
+        <View style={{ marginTop: 80 }} />
+        <Pressable
+          style={{
+            width: 200,
+            backgroundColor: "#0072b1",
+            borderRadius: 6,
+            marginLeft: "auto",
+            marginRight: "auto",
+            padding: 15,
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontSize: 16,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            Login
+          </Text>
+        </Pressable>
+        <Pressable
+          style={{
+            marginTop: 15,
+          }}
+          onPress={() => router.replace("/register")}
+        >
+          <Text
+            style={{
+              color: "gray",
+              fontSize: 16,
+              textAlign: "center",
+            }}
+          >
+            Don't have an account? Sign Up
+          </Text>
+        </Pressable>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
