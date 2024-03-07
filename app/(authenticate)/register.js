@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Pressable,
@@ -13,6 +14,7 @@ import { Fontisto } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import axios from "axios";
 
 const register = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +23,41 @@ const register = () => {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  return (
+  const clearState = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setImage("");
+  };
+
+  const handleRegister = () => {
+    const user = {
+      name: name,
+      email: email,
+      password: password,
+      profileImage: image,
+    };
+
+    axios
+      .post("http://192.168.18.83:8081/register", user)
+      .then((response) => {
+        console.log(response);
+        Alert.alert(
+          "Registration successful",
+          "You have been registered successfully"
+        );
+        clearState();
+      })
+      .catch((error) => {
+        Alert.alert(
+          "Registration failed",
+          "An error occured while registering"
+        );
+        console.log("Error", error);
+      });
+  };
+  //images.unsplash.com/photo-1633332755192-727a05c4013d
+  https: return (
     <SafeAreaView style={styles.container}>
       <View>
         <Image
@@ -187,6 +223,7 @@ const register = () => {
             marginRight: "auto",
             padding: 15,
           }}
+          onPress={handleRegister}
         >
           <Text
             style={{
