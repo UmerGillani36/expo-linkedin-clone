@@ -39,7 +39,7 @@ const register = () => {
     };
 
     axios
-      .post("http://192.168.18.83:8081/register", user)
+      .post("http://192.168.18.83:8000/register", user)
       .then((response) => {
         console.log(response);
         Alert.alert(
@@ -48,6 +48,7 @@ const register = () => {
         );
         clearState();
       })
+
       .catch((error) => {
         Alert.alert(
           "Registration failed",
@@ -56,8 +57,8 @@ const register = () => {
         console.log("Error", error);
       });
   };
-  //images.unsplash.com/photo-1633332755192-727a05c4013d
-  https: return (
+  // https://images.unsplash.com/photo-1633332755192-727a05c4013d
+  return (
     <SafeAreaView style={styles.container}>
       <View>
         <Image
