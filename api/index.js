@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const PORT = 8000;
@@ -11,12 +12,10 @@ const cors = require("cors");
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.json());
 
 mongoose
-  .connect("mongodb+srv://omer:Ghost1998*@cluster0.mug4kwa.mongodb.net/", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect("mongodb+srv://omer:Ghost1998*@cluster0.mug4kwa.mongodb.net/", {})
   .then(() => {
     console.log("Connected to MongoDB");
   })
@@ -44,7 +43,6 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Email already registered" });
     }
     // Create a new User
-
     const newUser = new User({
       name,
       email,
@@ -52,12 +50,12 @@ app.post("/register", async (req, res) => {
       profileImage,
     });
 
-    // generate the verification token
+    // // generate the verification token
     newUser.verificationToken = crypto.randomBytes(20).toString("hex");
 
     // save the user to database
 
-    await newUser.save();
+    const updatedUser = await newUser.save();
 
     // send the verification email to the registered email
 
@@ -66,6 +64,7 @@ app.post("/register", async (req, res) => {
     res.status(202).json({
       message:
         "Registration successful. Please check your mail for verfication",
+      payload: newUser,
     });
   } catch (error) {
     console.log("Error registering user", error);
@@ -74,6 +73,7 @@ app.post("/register", async (req, res) => {
 });
 
 const sendVerificationEmail = async (email, verificationToken) => {
+  console.log("sendVerificationEmail");
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -85,7 +85,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
     from: "linkedin@gmail.com",
     to: email,
     subject: "Email Verification",
-    text: `Please click the following link to verify your email : http://localhost:3000/verify/${verificationToken}`,
+    text: `Please click the following link to verify your email : http://localhost:8000/verify/${verificationToken}`,
   };
   // send the mail
 
@@ -99,7 +99,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
 
 // endpoint to verify email
 
-app.post("/verify/:token", async (req, res) => {
+app.get("/verify/:token", async (req, res) => {
   try {
     const token = req.params.token;
 
@@ -117,5 +117,40 @@ app.post("/verify/:token", async (req, res) => {
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
     res.status(500).json({ message: "Email verification failed" });
+  }
+});
+
+// generate secret key
+
+const generateSecretKey = () => {
+  const secretKey = crypto.randomBytes(32).toString("hex");
+
+  return secretKey;
+};
+// Assigning secret key
+
+const secretKey = generateSecretKey();
+
+// endpoint for login
+
+app.post("/login", (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, secretKey);
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.log("Error while login", error);
   }
 });
